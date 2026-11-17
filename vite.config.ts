@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/dora-engrc-website/',
+  base: '/engrc-3025-website/',
   plugins: [react()],
 })
 
