@@ -605,7 +605,7 @@ a.project-card {
   cursor: pointer;
 }
 
-.project-card__tip {
+.cursor-tip {
   position: fixed;
   z-index: 500;
   pointer-events: none;

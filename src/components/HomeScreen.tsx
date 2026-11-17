@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react"
 import { assetUrl } from "../assetUrl"
+import { useCursorTip } from "./useCursorTip"
 import { ResumeButton } from "./ResumeButton"
 import { SocialLinks } from "./SocialLinks"
 import { SiteNav, type Page } from "./SiteNav"
@@ -141,27 +142,16 @@ function StaticImageProjectCard({
 
 function LinkedProjectCard({ project }: { project: LinkedProject }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const tipRef = useRef<HTMLSpanElement>(null)
-  const [tipVisible, setTipVisible] = useState(false)
-
-  function moveTip(e: PointerEvent<HTMLAnchorElement>) {
-    const tip = tipRef.current
-    if (tip) {
-      tip.style.left = `${e.clientX}px`
-      tip.style.top = `${e.clientY}px`
-    }
-  }
+  const cursorTip = useCursorTip<HTMLAnchorElement>(project.tip)
 
   function startHover(e: PointerEvent<HTMLAnchorElement>) {
-    setTipVisible(true)
-    // Position after paint so tipRef is mounted
-    window.requestAnimationFrame(() => moveTip(e))
+    cursorTip.showTip(e)
     const video = videoRef.current
     if (video) void video.play().catch(() => {})
   }
 
   function hideTip() {
-    setTipVisible(false)
+    cursorTip.hideTip()
     const video = videoRef.current
     if (video) {
       video.pause()
@@ -173,7 +163,7 @@ function LinkedProjectCard({ project }: { project: LinkedProject }) {
     <a
       className={[
         "project-card",
-        tipVisible ? "is-hovered" : "",
+        cursorTip.visible ? "is-hovered" : "",
         "wide" in project && project.wide ? "project-card--wide" : "",
       ]
         .filter(Boolean)
@@ -183,7 +173,7 @@ function LinkedProjectCard({ project }: { project: LinkedProject }) {
       rel="noreferrer"
       aria-label={`${project.blurb} (${project.tip})`}
       onPointerEnter={startHover}
-      onPointerMove={moveTip}
+      onPointerMove={cursorTip.moveTip}
       onPointerLeave={hideTip}
     >
       <div className="project-card__mock">
@@ -212,11 +202,7 @@ function LinkedProjectCard({ project }: { project: LinkedProject }) {
           <span className="project-card__label">{project.label}</span>
         ) : null}
       </div>
-      {tipVisible ? (
-        <span className="project-card__tip" ref={tipRef} aria-hidden="true">
-          {project.tip}
-        </span>
-      ) : null}
+      {cursorTip.element}
     </a>
   )
 }

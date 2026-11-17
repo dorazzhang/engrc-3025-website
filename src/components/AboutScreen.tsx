@@ -1,4 +1,5 @@
 import { assetUrl } from "../assetUrl"
+import { useCursorTip } from "./useCursorTip"
 import { PhotoBoothSlot } from "./PhotoBoothSlot"
 import { ResumeButton } from "./ResumeButton"
 import { SiteNav, type Page } from "./SiteNav"
@@ -89,7 +90,8 @@ const GALLERY = [
     kind: "pic" as const,
     shape: "sq",
     src: assetUrl("dog.jpg"),
-    alt: "Close-up with a curly brown dog",
+    alt: "Picture with my dog",
+    caption: "buddy :)",
   },
   {
     id: "g2",
@@ -103,35 +105,40 @@ const GALLERY = [
     kind: "pic" as const,
     shape: "sq",
     src: assetUrl("friends5.jpg"),
-    alt: "Friends huddled under a blanket",
+    alt: "Friends",
+    caption: "hometown friends!!",
   },
   {
     id: "g7",
     kind: "pic" as const,
     shape: "sq",
     src: assetUrl("beach_painting.jpg"),
-    alt: "Holding up a finished beach painting",
+    alt: "Holding up my finished beach painting",
+    caption: "painting my favorite beach",
   },
   {
     id: "g3",
     kind: "pic" as const,
     shape: "wide",
-    src: assetUrl("friends9.PNG"),
-    alt: "Friends posing in front of a TASA blackboard",
+    src: assetUrl("hackmit_presentation.PNG"),
+    alt: "Presenting to judges at HackMIT",
+    caption: "presenting at HackMIT",
   },
   {
     id: "g5",
     kind: "pic" as const,
     shape: "wide",
     src: assetUrl("badminton_cifs.JPG"),
-    alt: "Badminton match in a high school gym",
+    alt: "Badminton match in high school",
+    caption: "badminton tourney!",
   },
   {
     id: "g6",
     kind: "pic" as const,
     shape: "mid",
-    src: assetUrl("fish_painting.jpg"),
-    alt: "Koi fish painting with brushes and palette",
+    src: assetUrl("swe_conference.JPG"),
+    alt: "SWE conference group photo with friends",
+    caption: "WE26 conference in boston",
   },
   { id: "g10", kind: "booth" as const, shape: "tall" },
   {
@@ -147,6 +154,7 @@ const GALLERY = [
     shape: "tall",
     src: assetUrl("fam.jpg"),
     alt: "Family selfie outdoors",
+    caption: "mom and dad!",
   },
   {
     id: "g12",
@@ -161,6 +169,7 @@ const GALLERY = [
     shape: "wide",
     src: assetUrl("friends11.JPG"),
     alt: "Friends at the SeaWorld entrance",
+    caption: "seaworld with friends",
   },
   {
     id: "g11",
@@ -168,15 +177,37 @@ const GALLERY = [
     shape: "mid",
     src: assetUrl("nexus.JPG"),
     alt: "Cornell Nexus team group photo",
+    caption: "nexus group photo!",
   },
   {
     id: "g14",
     kind: "pic" as const,
     shape: "wide",
-    src: assetUrl("friends10.JPG"),
-    alt: "Friends on a piggyback ride by the water",
+    src: assetUrl("nexus_working.JPEG"),
+    alt: "Working on a Nexus project in the ELL",
+    caption: "nexus work session",
   },
 ]
+
+type GalleryPhoto = Extract<(typeof GALLERY)[number], { kind: "pic" }>
+
+function GalleryPhotoCard({ item }: { item: GalleryPhoto }) {
+  const cursorTip = useCursorTip<HTMLDivElement>(item.caption)
+
+  return (
+    <div
+      className={["gallery-item", `gallery-item--${item.shape}`].join(" ")}
+      onPointerEnter={cursorTip.showTip}
+      onPointerMove={cursorTip.moveTip}
+      onPointerLeave={cursorTip.hideTip}
+    >
+      <div className="gallery-item__mock gallery-item__mock--photo">
+        <img src={item.src} alt={item.alt} />
+      </div>
+      {cursorTip.element}
+    </div>
+  )
+}
 
 export function AboutScreen({ onNavigate }: AboutScreenProps) {
   return (
@@ -334,16 +365,7 @@ export function AboutScreen({ onNavigate }: AboutScreenProps) {
                 <PhotoBoothSlot />
               </div>
             ) : (
-              <div
-                key={item.id}
-                className={["gallery-item", `gallery-item--${item.shape}`].join(
-                  " ",
-                )}
-              >
-                <div className="gallery-item__mock gallery-item__mock--photo">
-                  <img src={item.src} alt={item.alt} />
-                </div>
-              </div>
+              <GalleryPhotoCard key={item.id} item={item} />
             ),
           )}
         </div>
